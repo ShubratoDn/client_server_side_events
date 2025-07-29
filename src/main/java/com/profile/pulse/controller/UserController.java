@@ -1,7 +1,7 @@
 package com.profile.pulse.controller;
 
-import com.profile.pulse.model.FakeUser;
-import com.profile.pulse.service.FakeUserService;
+import com.profile.pulse.model.User;
+import com.profile.pulse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +13,12 @@ import java.time.Duration;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-public class FakeUserController {
-    private final FakeUserService userService;
+public class UserController {
+    private final UserService userService;
     
     // SSE endpoint
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<FakeUser> streamUsers(
+    public Flux<User> streamUsers(
             @RequestParam(required = false) Integer minAge,
             @RequestParam(required = false) Integer maxAge,
             @RequestParam(required = false) Integer minBonus,
@@ -63,28 +63,28 @@ public class FakeUserController {
                 .onErrorResume(e -> {
                     System.err.println("Error in stream: " + e.getMessage());
                     // Return an error event
-                    return Mono.just(new FakeUser());
+                    return Mono.just(new User());
                 });
     }
     
     // CRUD endpoints
     @PostMapping
-    public Mono<FakeUser> createUser(@RequestBody FakeUser user) {
+    public Mono<User> createUser(@RequestBody User user) {
         return userService.saveUser(user);
     }
     
     @GetMapping
-    public Flux<FakeUser> getAllUsers() {
+    public Flux<User> getAllUsers() {
         return userService.getAllUsers();
     }
     
     @GetMapping("/{id}")
-    public Mono<FakeUser> getUserById(@PathVariable String id) {
+    public Mono<User> getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }
     
     @PutMapping("/{id}")
-    public Mono<FakeUser> updateUser(@PathVariable String id, @RequestBody FakeUser user) {
+    public Mono<User> updateUser(@PathVariable String id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
     
@@ -100,20 +100,20 @@ public class FakeUserController {
     
     // Custom query endpoints
     @GetMapping("/age-range")
-    public Flux<FakeUser> getUsersByAgeRange(
+    public Flux<User> getUsersByAgeRange(
             @RequestParam int min,
             @RequestParam int max) {
         return userService.getUsersByAgeRange(min, max);
     }
     
     @GetMapping("/bonus")
-    public Flux<FakeUser> getUsersWithBonusGreaterThan(
+    public Flux<User> getUsersWithBonusGreaterThan(
             @RequestParam int minBonus) {
         return userService.getUsersWithBonusGreaterThan(minBonus);
     }
 
     @GetMapping("/search")
-    public Flux<FakeUser> searchUsers(@RequestParam String q) {
+    public Flux<User> searchUsers(@RequestParam String q) {
         return userService.searchUsers(q);
     }
 }

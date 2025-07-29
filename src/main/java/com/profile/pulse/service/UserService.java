@@ -3,7 +3,7 @@ package com.profile.pulse.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.profile.pulse.dto.UserDTO;
 import com.profile.pulse.model.User;
-import com.profile.pulse.repository.FakeUserRepository;
+import com.profile.pulse.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +17,9 @@ import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
-public class FakeUserService {
+public class UserService {
     private final WebClient webClient;
-    private final FakeUserRepository repository;
+    private final UserRepository repository;
     
     private static final String API_URL = "https://api.namefake.com/";
     

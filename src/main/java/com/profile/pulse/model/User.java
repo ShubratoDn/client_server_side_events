@@ -1,6 +1,5 @@
 package com.profile.pulse.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -8,10 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "fakeUsers")
+@Document(collection = "users")
 @Data
 @NoArgsConstructor
-public class FakeUser {
+public class User {
     @Id
     private String id;
     private String name;
@@ -32,7 +31,7 @@ public class FakeUser {
     private double bmi; // Another transformed field
     private LocalDateTime createdAt;
 
-    public FakeUser(String id, String name, String address, double latitude, double longitude, String birthData, String phone, String email, String username, int age, int bonus, String company, int height, double weight, String blood, String color, double bmi, LocalDateTime createdAt) {
+    public User(String id, String name, String address, double latitude, double longitude, String birthData, String phone, String email, String username, int age, int bonus, String company, int height, double weight, String blood, String color, double bmi, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.address = address;

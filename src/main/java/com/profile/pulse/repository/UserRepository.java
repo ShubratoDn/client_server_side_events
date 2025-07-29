@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import reactor.core.publisher.Flux;
 
-public interface FakeUserRepository extends ReactiveMongoRepository<User, String> {
+public interface UserRepository extends ReactiveMongoRepository<User, String> {
     // Custom query to find users by age range
     Flux<User> findByAgeBetween(int minAge, int maxAge);
     
