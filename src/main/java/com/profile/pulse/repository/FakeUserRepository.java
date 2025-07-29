@@ -10,4 +10,7 @@ public interface FakeUserRepository extends ReactiveMongoRepository<FakeUser, St
     
     // Custom query to find users with bonus greater than specified value
     Flux<FakeUser> findByBonusGreaterThan(int bonus);
+
+    // Find all users sorted by createdAt descending
+    Flux<FakeUser> findAllByOrderByCreatedAtDesc();
 }

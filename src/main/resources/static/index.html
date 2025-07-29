@@ -105,6 +105,22 @@
           <label class="form-label">Company</label>
           <input type="text" class="form-control" id="createCompany">
         </div>
+        <div class="mb-2">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" id="createUsername">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-control" id="createPhone">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="createEmail">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Date of Birth</label>
+          <input type="text" class="form-control" id="createDob" placeholder="YYYY-MM-DD">
+        </div>
         <!-- Add more fields as needed -->
       </div>
       <div class="modal-footer">
@@ -158,6 +174,22 @@
           <label class="form-label">Company</label>
           <input type="text" class="form-control" id="updateCompany">
         </div>
+        <div class="mb-2">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" id="updateUsername">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-control" id="updatePhone">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="updateEmail">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Date of Birth</label>
+          <input type="text" class="form-control" id="updateDob" placeholder="YYYY-MM-DD">
+        </div>
         <!-- Add more fields as needed -->
       </div>
       <div class="modal-footer">
@@ -207,13 +239,24 @@
             if (user.name === "Error") {
                 showStreamAlert('An error occurred while streaming data.', 'danger');
             } else {
+                // Determine if user is saved (has an id)
+                const isSaved = user.id && user.id !== "";
+                const cardClass = isSaved ? "alert-success" : "alert-secondary";
                 output.innerHTML += `
-                    <div class="alert alert-secondary p-2 mb-1">
+                    <div class="alert ${cardClass} p-2 mb-1">
                         <strong>${user.name}</strong> (Age: ${user.age}, Bonus: ${user.bonus}, BMI: ${user.bmi ? user.bmi.toFixed(1) : '-'}<br>
+                        Username: ${user.username || '-'}<br>
+                        Phone: ${user.phone || '-'}<br>
+                        Email: ${user.email || '-'}<br>
+                        Date of Birth: ${user.birthData || '-'}<br>
+                        Company: ${user.company || '-'}<br>
                         Height: ${user.height || '-'} cm, Weight: ${user.weight || '-'} kg, Blood: ${user.blood || '-'}, Color: ${user.color || '-'}
-                        )
                     </div>
                 `;
+                // If saved, refresh user list
+                if (isSaved) {
+                    fetchUsers();
+                }
             }
             output.scrollTop = output.scrollHeight;
         };
@@ -248,16 +291,20 @@
                                 <div class="card-body">
                                     <h5 class="card-title">${user.name}</h5>
                                     <p class="card-text">
+                                        <strong>Username:</strong> ${user.username || '-'}<br>
+                                        <strong>Phone:</strong> ${user.phone || '-'}<br>
+                                        <strong>Email:</strong> ${user.email || '-'}<br>
+                                        <strong>Date of Birth:</strong> ${user.birthData || '-'}<br>
+                                        <strong>Company:</strong> ${user.company || '-'}<br>
                                         <strong>Age:</strong> ${user.age}<br>
                                         <strong>Bonus:</strong> ${user.bonus}<br>
                                         <strong>Height:</strong> ${user.height || '-'} cm<br>
                                         <strong>Weight:</strong> ${user.weight || '-'} kg<br>
                                         <strong>Blood Group:</strong> ${user.blood || '-'}<br>
                                         <strong>Favorite Color:</strong> ${user.color || '-'}<br>
-                                        <strong>BMI:</strong> ${user.bmi ? user.bmi.toFixed(1) : '-'}<br>
-                                        <strong>Company:</strong> ${user.company || '-'}
+                                        <strong>BMI:</strong> ${user.bmi ? user.bmi.toFixed(1) : '-'}
                                     </p>
-                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="openUpdateModal('${user.id}', '${user.name}', ${user.age}, ${user.bonus}, ${user.height || 0}, ${user.weight || 0}, '${user.blood || ''}', '${user.color || ''}', '${user.company || ''}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="openUpdateModal('${user.id}', '${user.name}', ${user.age}, ${user.bonus}, ${user.height || 0}, ${user.weight || 0}, '${user.blood || ''}', '${user.color || ''}', '${user.company || ''}', '${user.username || ''}', '${user.phone || ''}', '${user.email || ''}', '${user.birthData || ''}')">Edit</button>
                                     <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}')">Delete</button>
                                 </div>
                             </div>
@@ -287,6 +334,10 @@
             blood: document.getElementById('createBlood').value,
             color: document.getElementById('createColor').value,
             company: document.getElementById('createCompany').value,
+            username: document.getElementById('createUsername').value,
+            phone: document.getElementById('createPhone').value,
+            email: document.getElementById('createEmail').value,
+            birthData: document.getElementById('createDob').value,
             bmi: 0 // Will be recalculated on backend
         };
         axios.post('/api/users', user)
@@ -303,7 +354,7 @@
     }
 
     // Update User
-    function openUpdateModal(id, name, age, bonus, height, weight, blood, color, company) {
+    function openUpdateModal(id, name, age, bonus, height, weight, blood, color, company, username, phone, email, birthData) {
         document.getElementById('updateId').value = id;
         document.getElementById('updateName').value = name;
         document.getElementById('updateAge').value = age;
@@ -313,6 +364,10 @@
         document.getElementById('updateBlood').value = blood;
         document.getElementById('updateColor').value = color;
         document.getElementById('updateCompany').value = company;
+        document.getElementById('updateUsername').value = username;
+        document.getElementById('updatePhone').value = phone;
+        document.getElementById('updateEmail').value = email;
+        document.getElementById('updateDob').value = birthData;
         var modal = new bootstrap.Modal(document.getElementById('updateUserModal'));
         modal.show();
     }
@@ -329,6 +384,10 @@
             blood: document.getElementById('updateBlood').value,
             color: document.getElementById('updateColor').value,
             company: document.getElementById('updateCompany').value,
+            username: document.getElementById('updateUsername').value,
+            phone: document.getElementById('updatePhone').value,
+            email: document.getElementById('updateEmail').value,
+            birthData: document.getElementById('updateDob').value,
             bmi: 0 // Will be recalculated on backend
         };
         axios.put(`/api/users/${id}`, user)

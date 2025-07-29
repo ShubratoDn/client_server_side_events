@@ -84,7 +84,7 @@ public class FakeUserService {
     }
     
     public Flux<FakeUser> getAllUsers() {
-        return repository.findAll();
+        return repository.findAllByOrderByCreatedAtDesc();
     }
     
     public Mono<FakeUser> getUserById(String id) {
