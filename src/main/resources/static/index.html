@@ -59,7 +59,7 @@
                     <span class="badge bg-primary">Streaming...</span>
                 </span>
             </div>
-            <div id="streamOutput" class="mt-3" style="max-height: 50vh; overflow-y: auto;"></div>
+            <div id="streamOutput" class="mt-3" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
     </div>
 
@@ -67,7 +67,12 @@
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">User Profiles</h5>
         <div>
-
+            <div class="input-group mb-3" style="max-width: 400px;">
+                <input type="text" class="form-control" id="userSearchInput" placeholder="Search users..." oninput="filterUsers()">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+            </div>
+        </div>
+        <div>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">Add New User</button>
         </div>
     </div>
@@ -274,12 +279,12 @@
                         <div class="row g-0">
                           <div class="col-4 ps-2">
                             <small><i class="bi bi-person"></i> <b>Username:</b> ${user.username || '-'}</small><br>
-                            <small><i class="bi bi-building"></i> <b>Company:</b> ${user.company || '-'}</small>
+                            <small><i class="bi bi-building"></i> <b>Company:</b> ${user.company || '-'}</small><br>
                             <small><i class="bi bi-telephone"></i> <b>Phone:</b> ${user.phone || '-'}</small><br>
                             <small><i class="bi bi-envelope"></i> <b>Email:</b> ${user.email || '-'}</small><br>
                           </div>
                           <div class="col-4 ps-2">
-                            <small><i class="bi bi-calendar"></i> <b>DOB:</b> ${user.birthData || '-'}</small>
+                            <small><i class="bi bi-calendar"></i> <b>DOB:</b> ${user.birthData || '-'}</small> <br>
                             <small><b>Age:</b> ${user.age || '-'}</small><br>
                             <small><b>Bonus:</b> ${user.bonus || '-'}</small><br>
                             <small><b>Color:</b> ${user.color || '-'}</small><br>
@@ -328,39 +333,58 @@
     function fetchUsers() {
         axios.get('/api/users')
             .then(response => {
-                const usersList = document.getElementById('usersList');
-                usersList.innerHTML = '';
-                response.data.forEach(user => {
-                    usersList.innerHTML += `
-                        <div class="col-md-4">
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">${user.name}</h5>
-                                    <p class="card-text">
-                                        <strong>Username:</strong> ${user.username || '-'}<br>
-                                        <strong>Phone:</strong> ${user.phone || '-'}<br>
-                                        <strong>Email:</strong> ${user.email || '-'}<br>
-                                        <strong>Date of Birth:</strong> ${user.birthData || '-'}<br>
-                                        <strong>Company:</strong> ${user.company || '-'}<br>
-                                        <strong>Age:</strong> ${user.age}<br>
-                                        <strong>Bonus:</strong> ${user.bonus}<br>
-                                        <strong>Height:</strong> ${user.height || '-'} cm<br>
-                                        <strong>Weight:</strong> ${user.weight || '-'} kg<br>
-                                        <strong>Blood Group:</strong> ${user.blood || '-'}<br>
-                                        <strong>Favorite Color:</strong> ${user.color || '-'}<br>
-                                        <strong>BMI:</strong> ${user.bmi ? user.bmi.toFixed(1) : '-'}
-                                    </p>
-                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="openUpdateModal('${user.id}', '${user.name}', ${user.age}, ${user.bonus}, ${user.height || 0}, ${user.weight || 0}, '${user.blood || ''}', '${user.color || ''}', '${user.company || ''}', '${user.username || ''}', '${user.phone || ''}', '${user.email || ''}', '${user.birthData || ''}')">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}')">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
+                renderUsers(response.data);
             })
             .catch(error => {
                 showUserAlert('Error fetching users.', 'danger');
             });
+    }
+
+    function filterUsers() {
+        const query = document.getElementById('userSearchInput').value.trim();
+        if (!query) {
+            fetchUsers();
+            return;
+        }
+        axios.get('/api/users/search?q=' + encodeURIComponent(query))
+            .then(response => {
+                renderUsers(response.data);
+            })
+            .catch(() => {
+                showUserAlert('Error searching users.', 'danger');
+            });
+    }
+
+    function renderUsers(users) {
+        const usersList = document.getElementById('usersList');
+        usersList.innerHTML = '';
+        users.forEach(user => {
+            usersList.innerHTML += `
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${user.name}</h5>
+                            <p class="card-text">
+                                <strong>Username:</strong> ${user.username || '-'}<br>
+                                <strong>Phone:</strong> ${user.phone || '-'}<br>
+                                <strong>Email:</strong> ${user.email || '-'}<br>
+                                <strong>Date of Birth:</strong> ${user.birthData || '-'}<br>
+                                <strong>Company:</strong> ${user.company || '-'}<br>
+                                <strong>Age:</strong> ${user.age}<br>
+                                <strong>Bonus:</strong> ${user.bonus}<br>
+                                <strong>Height:</strong> ${user.height || '-'} cm<br>
+                                <strong>Weight:</strong> ${user.weight || '-'} kg<br>
+                                <strong>Blood Group:</strong> ${user.blood || '-'}<br>
+                                <strong>Favorite Color:</strong> ${user.color || '-'}<br>
+                                <strong>BMI:</strong> ${user.bmi ? user.bmi.toFixed(1) : '-'}
+                            </p>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="openUpdateModal('${user.id}', '${user.name}', ${user.age}, ${user.bonus}, ${user.height || 0}, ${user.weight || 0}, '${user.blood || ''}', '${user.color || ''}', '${user.company || ''}', '${user.username || ''}', '${user.phone || ''}', '${user.email || ''}', '${user.birthData || ''}')">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}')">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
     }
 
     function showUserAlert(message, type) {

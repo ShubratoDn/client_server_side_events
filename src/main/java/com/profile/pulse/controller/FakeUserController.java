@@ -50,6 +50,10 @@ public class FakeUserController {
                         shouldSave = false;
                     }
 
+                    if(minAge == null && maxAge == null && bloodGroup == null && minBonus == null && minWeight == null) {
+                        shouldSave = false;
+                    }
+
                     if (shouldSave) {
                         return userService.saveUser(user);
                     } else {
@@ -106,5 +110,10 @@ public class FakeUserController {
     public Flux<FakeUser> getUsersWithBonusGreaterThan(
             @RequestParam int minBonus) {
         return userService.getUsersWithBonusGreaterThan(minBonus);
+    }
+
+    @GetMapping("/search")
+    public Flux<FakeUser> searchUsers(@RequestParam String q) {
+        return userService.searchUsers(q);
     }
 }

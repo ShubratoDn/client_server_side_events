@@ -115,4 +115,13 @@ public class FakeUserService {
     public Flux<FakeUser> getUsersWithBonusGreaterThan(int bonus) {
         return repository.findByBonusGreaterThan(bonus);
     }
+
+    private String escapeRegex(String input) {
+        return input == null ? null : input.replaceAll("([\\\\.*+\\[\\](){}|^$?])", "\\\\$1");
+    }
+
+    public Flux<FakeUser> searchUsers(String query) {
+        String safeQuery = escapeRegex(query);
+        return repository.searchUsers(safeQuery);
+    }
 }
