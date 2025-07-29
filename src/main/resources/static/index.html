@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake User Stream</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<h1>Fake User Stream</h1>
+
+<div>
+    <h2>Stream Controls</h2>
+    <form id="streamForm">
+        <label>Min Age: <input type="number" id="minAge"></label>
+        <label>Max Age: <input type="number" id="maxAge"></label>
+        <label>Min Bonus: <input type="number" id="minBonus"></label>
+        <button type="button" onclick="startStream()">Start Stream</button>
+        <button type="button" onclick="stopStream()">Stop Stream</button>
+    </form>
+    <div id="streamOutput"></div>
+</div>
+
+<div>
+    <h2>Saved Users</h2>
+    <button onclick="fetchUsers()">Refresh Users</button>
+    <div id="usersList"></div>
+</div>
+
+<script>
+    let eventSource;
+
+    function startStream() {
+        const minAge = document.getElementById('minAge').value;
+        const maxAge = document.getElementById('maxAge').value;
+        const minBonus = document.getElementById('minBonus').value;
+
+        let url = '/api/users/stream';
+        const params = new URLSearchParams();
+
+        if (minAge) params.append('minAge', minAge);
+        if (maxAge) params.append('maxAge', maxAge);
+        if (minBonus) params.append('minBonus', minBonus);
+
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
+        eventSource = new EventSource(url);
+
+        eventSource.onmessage = function(event) {
+            const user = JSON.parse(event.data);
+            const output = document.getElementById('streamOutput');
+
+            if (user.name === "Error") {
+                output.innerHTML += '<p style="color: red;">Error occurred while streaming data</p>';
+            } else {
+                output.innerHTML += `<p>New user: ${user.name}, Age: ${user.age}, Bonus: ${user.bonus}, BMI: ${user.bmi.toFixed(1)}</p>`;
+            }
+
+            // Auto-scroll to bottom
+            output.scrollTop = output.scrollHeight;
+        };
+
+        eventSource.onerror = function() {
+            const output = document.getElementById('streamOutput');
+            output.innerHTML += '<p style="color: red;">Stream connection error</p>';
+            eventSource.close();
+        };
+    }
+
+    function stopStream() {
+        if (eventSource) {
+            eventSource.close();
+            document.getElementById('streamOutput').innerHTML += '<p>Stream stopped</p>';
+        }
+    }
+
+    function fetchUsers() {
+        axios.get('/api/users')
+            .then(response => {
+                const usersList = document.getElementById('usersList');
+                usersList.innerHTML = '';
+
+                response.data.forEach(user => {
+                    usersList.innerHTML += `
+                            <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                                <h3>${user.name}</h3>
+                                <p>Age: ${user.age}</p>
+                                <p>Bonus: ${user.bonus}</p>
+                                <p>BMI: ${user.bmi.toFixed(1)}</p>
+                                <p>Company: ${user.company}</p>
+                                <button onclick="deleteUser('${user.id}')">Delete</button>
+                            </div>
+                        `;
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
+    }
+
+    function deleteUser(id) {
+        axios.delete(`/api/users/${id}`)
+            .then(() => {
+                fetchUsers();
+            })
+            .catch(error => {
+                console.error('Error deleting user:', error);
+            });
+    }
+
+    // Initial load
+    fetchUsers();
+</script>
+</body>
+</html>
