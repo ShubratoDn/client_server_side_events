@@ -39,7 +39,7 @@ public class UserService {
                         // Parsing the data.
                         ObjectMapper mapper = new ObjectMapper();
                         UserDTO dto = mapper.readValue(rawResponse, UserDTO.class);
-                        return Mono.just(transformToFakeUser(dto));
+                        return Mono.just(transformToUser(dto));
                     } catch (Exception e) {
                         System.err.println("Error parsing JSON: " + e.getMessage());
                         return Mono.error(e);
@@ -47,7 +47,7 @@ public class UserService {
                 });
     }
     
-    private User transformToFakeUser(UserDTO dto) {
+    private User transformToUser(UserDTO dto) {
         // Calculate age from birth date
         int age = Period.between(
             LocalDate.parse(dto.getBirth_data()),
