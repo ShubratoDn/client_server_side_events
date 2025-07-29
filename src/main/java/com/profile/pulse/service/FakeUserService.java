@@ -103,6 +103,10 @@ public class FakeUserService {
         return repository.deleteById(id);
     }
     
+    public Mono<Void> deleteAllUsers() {
+        return repository.deleteAll();
+    }
+    
     // Custom queries
     public Flux<FakeUser> getUsersByAgeRange(int min, int max) {
         return repository.findByAgeBetween(min, max);
