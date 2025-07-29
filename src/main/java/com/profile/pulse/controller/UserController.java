@@ -23,7 +23,8 @@ public class UserController {
             @RequestParam(required = false) Integer maxAge,
             @RequestParam(required = false) Integer minBonus,
             @RequestParam(required = false) String bloodGroup,
-            @RequestParam(required = false) Double minWeight) {
+            @RequestParam(required = false) Double minWeight,
+            @RequestParam(required = false) Double minBmi) {
         
         return Flux.interval(Duration.ofSeconds(2))
                 .flatMap(tick -> userService.fetchAndTransformUserData())
@@ -50,7 +51,11 @@ public class UserController {
                         shouldSave = false;
                     }
 
-                    if(minAge == null && maxAge == null && bloodGroup == null && minBonus == null && minWeight == null) {
+                    if (minBmi != null && user.getBmi() < minBmi) {
+                        shouldSave = false;
+                    }
+
+                    if(minAge == null && maxAge == null && bloodGroup == null && minBonus == null && minWeight == null && minBmi == null) {
                         shouldSave = false;
                     }
 
