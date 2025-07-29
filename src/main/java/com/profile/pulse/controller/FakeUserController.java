@@ -21,7 +21,9 @@ public class FakeUserController {
     public Flux<FakeUser> streamUsers(
             @RequestParam(required = false) Integer minAge,
             @RequestParam(required = false) Integer maxAge,
-            @RequestParam(required = false) Integer minBonus) {
+            @RequestParam(required = false) Integer minBonus,
+            @RequestParam(required = false) String bloodGroup,
+            @RequestParam(required = false) Double minWeight) {
         
         return Flux.interval(Duration.ofSeconds(2))
                 .flatMap(tick -> userService.fetchAndTransformUserData())
@@ -40,6 +42,14 @@ public class FakeUserController {
                         shouldSave = false;
                     }
 
+                    if (bloodGroup != null && !bloodGroup.isBlank() && (user.getBlood() == null || !user.getBlood().equalsIgnoreCase(bloodGroup))) {
+                        shouldSave = false;
+                    }
+
+                    if (minWeight != null && user.getWeight() < minWeight) {
+                        shouldSave = false;
+                    }
+
                     if (shouldSave) {
                         return userService.saveUser(user);
                     } else {
@@ -47,10 +57,9 @@ public class FakeUserController {
                     }
                 })
                 .onErrorResume(e -> {
-                    // Log error
                     System.err.println("Error in stream: " + e.getMessage());
                     // Return an error event
-                    return Mono.just(new FakeUser(null, "Error", null, 0, 0, null, null, null, null, 0, 0, null, 0, null));
+                    return Mono.just(new FakeUser());
                 });
     }
     

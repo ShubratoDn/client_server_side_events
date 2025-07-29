@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Document(collection = "fakeUsers")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class FakeUser {
     @Id
     private String id;
@@ -26,6 +25,31 @@ public class FakeUser {
     private int age; // This will be our transformed field
     private int bonus;
     private String company;
+    private int height;
+    private double weight;
+    private String blood;
+    private String color;
     private double bmi; // Another transformed field
     private LocalDateTime createdAt;
+
+    public FakeUser(String id, String name, String address, double latitude, double longitude, String birthData, String phone, String email, String username, int age, int bonus, String company, int height, double weight, String blood, String color, double bmi, LocalDateTime createdAt) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.birthData = birthData;
+        this.phone = phone;
+        this.email = email;
+        this.username = username;
+        this.age = age;
+        this.bonus = bonus;
+        this.company = company;
+        this.height = height;
+        this.weight = weight;
+        this.blood = blood;
+        this.color = color;
+        this.bmi = bmi;
+        this.createdAt = createdAt;
+    }
 }
